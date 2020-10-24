@@ -17,3 +17,12 @@ async def create_product(payload: ProductSchema):
         "description": payload.description,
     }
     return response_object
+
+
+@router.get("/{id}/", response_model=ProductDB)
+async def read_product(id: int):
+    product = await crud.get(id)
+
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return product
