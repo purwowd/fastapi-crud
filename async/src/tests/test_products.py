@@ -48,3 +48,19 @@ def test_read_product_incorrect_id(test_app, monkeypatch):
     res = test_app.get("/products/99")
     assert res.status_code == 404
     assert res.json()["detail"] == "Product not found"
+
+
+def test_read_all_product(test_app, monkeypatch):
+    data = [
+        {"name": "product 1", "description": "product desc 1", "id": 1},
+        {"name": "product 2", "description": "product desc 2", "id": 2},
+    ]
+
+    async def mock_get_all():
+        return data
+
+    monkeypatch.setattr(crud, "get_all", mock_get_all)
+
+    res = test_app.get("/products/")
+    assert res.status_code == 200
+    assert res.json() == data

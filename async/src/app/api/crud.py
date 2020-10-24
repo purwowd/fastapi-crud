@@ -11,3 +11,8 @@ async def get(id: int):
     query = products.select().where(id == products.c.id)
     return await database.fetch_one(query=query)
 
+
+async def get_all():
+    query = products.select()
+    return await database.fetch_all(query=query)
+
