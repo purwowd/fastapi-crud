@@ -64,3 +64,43 @@ def test_read_all_product(test_app, monkeypatch):
     res = test_app.get("/products/")
     assert res.status_code == 200
     assert res.json() == data
+
+
+def test_update_product(test_app, monkeypatch):
+    data = {"name": "product 1", "description": "product desc 1", "id": 1}
+
+    async def mock_get(id):
+        print(id)
+        return True
+
+    monkeypatch.setattr(crud, "get", mock_get)
+
+    async def mock_put(id, payload):
+        print(id)
+        print(payload)
+        return 1
+
+    monkeypatch.setattr(crud, "put", mock_put)
+    res = test_app.put("/products/1/", data=json.dumps(data))
+
+    assert res.status_code == 200
+    assert res.json() == data
+
+
+@pytest.mark.parametrize(
+    "id, payload, status_code",
+    [
+        [1, {}, 422],
+        [1, {"description": "bar"}, 422],
+        [999, {"name": "foo", "description": "bar"}, 404],
+    ],
+)
+def test_update_product_invalid(test_app, monkeypatch, id, payload, status_code):
+    async def mock_get(id):
+        print(id)
+        return None
+
+    monkeypatch.setattr(crud, "get", mock_get)
+
+    res = test_app.put(f"/products/{id}/", data=json.dumps(payload),)
+    assert res.status_code == status_code

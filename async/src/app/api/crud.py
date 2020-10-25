@@ -16,3 +16,13 @@ async def get_all():
     query = products.select()
     return await database.fetch_all(query=query)
 
+
+async def put(id: int, payload: ProductSchema):
+    query = (
+        products
+        .update()
+        .where(id == products.c.id)
+        .values(name=payload.name, description=payload.description)
+        .returning(products.c.id)
+    )
+    return await database.execute(query=query)

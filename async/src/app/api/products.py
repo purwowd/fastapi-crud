@@ -32,3 +32,20 @@ async def read_product(id: int):
 @router.get("/", response_model=List[ProductDB])
 async def read_all_product():
     return await crud.get_all()
+
+
+@router.put("/{id}/", response_model=ProductDB)
+async def update_product(id: int, payload: ProductSchema):
+    product = await crud.get(id)
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    product_id = await crud.put(id, payload)
+
+    res_object = {
+        "id": product_id,
+        "name": payload.name,
+        "description": payload.description,
+    }
+
+    return res_object
