@@ -26,3 +26,8 @@ async def put(id: int, payload: ProductSchema):
         .returning(products.c.id)
     )
     return await database.execute(query=query)
+
+
+async def delete(id: int):
+    query = products.delete().where(id == products.c.id)
+    return await database.execute(query=query)

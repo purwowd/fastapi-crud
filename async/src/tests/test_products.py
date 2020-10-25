@@ -104,3 +104,34 @@ def test_update_product_invalid(test_app, monkeypatch, id, payload, status_code)
 
     res = test_app.put(f"/products/{id}/", data=json.dumps(payload),)
     assert res.status_code == status_code
+
+
+def test_delete_product(test_app, monkeypatch):
+    data = {"name": "product 1", "description": "product 1 desc", "id": 1}
+
+    async def mock_get(id):
+        print(id)
+        return data
+
+    monkeypatch.setattr(crud, "get", mock_get)
+
+    async def mock_delete(id):
+        print(id)
+
+    monkeypatch.setattr(crud, "delete", mock_delete)
+
+    res = test_app.delete("/products/1/")
+    assert res.status_code == 200
+    assert res.json() == data
+
+
+def test_delete_product_incorret_id(test_app, monkeypatch):
+    async def mock_get(id):
+        print(id)
+        return None
+
+    monkeypatch.setattr(crud, "get", mock_get)
+
+    res = test_app.delete("/products/999/")
+    assert res.status_code == 404
+    assert res.json()["detail"] == "Product not found"

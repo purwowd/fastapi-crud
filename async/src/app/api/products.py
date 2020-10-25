@@ -49,3 +49,14 @@ async def update_product(id: int, payload: ProductSchema):
     }
 
     return res_object
+
+
+@router.delete("/{id}/", response_model=ProductDB)
+async def delete_product(id: int):
+    product = await crud.get(id)
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    await crud.delete(id)
+
+    return product
